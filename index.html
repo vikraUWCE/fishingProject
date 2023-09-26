@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fishing Simulation</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <style>
+      @keyframes flash {
+        0% {
+          background-color: white;
+        }
+        50% {
+          background-color: red;
+        }
+        100% {
+          background-color: white;
+        }
+      }
+
+      body.flash {
+        animation: flash 0.5s infinite;
+      }
+    </style>
+
+    <h1 id="companyName">Your Stats</h1>
+    <h3>
+      Population Status:
+      <h3 id="popStatus"></h3>
+    </h3>
+
+    <h2>Summary:</h2>
+    <h3 id="summary"></h3>
+    <canvas id="fishChart" width="400" height="200"></canvas>
+
+    <div>
+      <label for="numBoats">Number of Boats to Send:</label>
+      <!--Alphabet not allowed in text box, minimum set to 0-->
+      <input type="number" id="numBoats" min="0" />
+      <button id="launchSimulation">Launch Simulation</button>
+    </div>
+    <canvas id="fishAndRevenueLineChart" width="400" height="200"></canvas>
+    <div id="endScreen" style="display: none">
+      <h1>Game Over</h1>
+      <p>
+        The fish population has reached zero. Your fishing adventure has come to
+        an end.
+      </p>
+    </div>
+
+    <h1>Would you like to buy more boats?</h1>
+    <div>
+      <h3 id="nicerBoat"></h3>
+      <button id="nicerBoatButton">Buy this boat!</button>
+    </div>
+
+    <script>
+      // Initialize Chart.js
+      const ctx = document.getElementById("fishChart").getContext("2d");
+      const fishChart = new Chart(ctx, {
+        type: "bar", // Bar chart
+        data: {
+          labels: [], // Week labels
+          datasets: [
+            {
+              label: "Fish Caught per Week",
+              data: [], // Data for the chart
+              backgroundColor: "rgba(75, 192, 192, 0.6)", // Bar color
+            },
+          ],
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: "Number of Fish Caught",
+              },
+            },
+            x: {
+              title: {
+                display: true,
+                text: "Week",
+              },
+            },
+          },
+        },
+      });
+
+      // Function to update the population status
+      function updatePopulationStatus(totalFish) {
+        //display red white flashing with if else statement if totalFish <-= 0
+        if (totalFish <= 0) {
+          document.getElementById("popStatus").textContent =
+            "FISH POPULATION HAS REACHED ZERO!";
+          document.body.classList.add("flash");
+          location.reload(
+            alert(
+              "Your page has reloaded due to a total loss of fish. Be more sustainable, please. Your use of this program is being ceased."
+            )
+          );
+          // Display the end screen
+          document.getElementById("endScreen").style.display = "block";
+        }
+        //if else if statement to change the prompt based on totalFish population
+        if (totalFish < 200) {
+          document.getElementById("popStatus").textContent =
+            "WARNING: FISH POPULATION IS CRITICALLY LOW!!!";
+          document.body.classList.add("flash");
+        } else if (totalFish < 500) {
+          document.getElementById("popStatus").textContent =
+            "CAUTION: YOUR SHOULD REDUCE FISHING PER WEEK IN ORDER TO ALLOW POPULATION RECOVERY!!";
+        } else {
+          document.getElementById("popStatus").textContent =
+            "NO NEED TO TAKE ACTION TO PREVENT FISH POPULATION DEGENERATION. CONTINUE TO FISH RESPONSIBLY!";
+        }
+      }
+      //initalizing let variables and constants
+      let totalFish = 1000;
+      let totalRevenue = 0;
+      let weeks = 0;
+
+      const fishCaughtPerWeek = [];
+      let revenue = 0; // Declare revenue as a global variable
+      let fishCaught = 0; // Declare fishCaught as a global variable
+
+      // Event listener for the button click to add boats sent per week and update bar chart
+      document
+        .getElementById("launchSimulation")
+        .addEventListener("click", function () {
+          const numBoats = parseInt(
+            document.getElementById("numBoats").value,
+            10
+          );
+          console.log(numBoats);
+          //if statement that runs all calculations displayed on screen and uses .push() to add to the graph array
+          if (numBoats) {
+            fishCaught = numBoats * 20;
+            revenue = numBoats * 50;
+            let fishGrowth = Math.round(totalFish * 0.05);
+            totalFish -= fishCaught;
+            totalFish += fishGrowth;
+            totalRevenue += revenue;
+            //adding fishCaught to fishCaughtPerWeek array
+            fishCaughtPerWeek.push(fishCaught);
+            fishChart.data.labels.push(`Week ${weeks + 1}`);
+            fishChart.data.datasets[0].data.push(fishCaught);
+            fishChart.update(); // Update the chart
+            updatePopulationStatus(totalFish);
+            //Increment weeks by 1
+            weeks++;
+            //Add final summary
+            document.getElementById(
+              "summary"
+            ).textContent = `End of your summary - Total Fish: ${totalFish}, Total Revenue: $${totalRevenue}, Fish growth this week: ${fishGrowth}.`;
+          }
+        });
+      document
+        .getElementById("nicerBoatButton")
+        .addEventListener("click", function () {
+          // Update the fishCaught value to 100
+          fishCaught = numBoats * 80;
+          revenue = numBoats * 200;
+          document.getElementById("nicerBoat").textContent = "Boat bought.";
+        });
+      //prompt for company name stored in "company" variable
+      let company = prompt("What's your company name?");
+      document.getElementById(
+        "companyName"
+      ).textContent = `Hello, ${company}. Here are your fishing stats.`;
+      //closing screen + warning
+    </script>
+  </body>
+</html>
