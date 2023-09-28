@@ -141,7 +141,13 @@
           if (numBoats) {
             fishCaught = numBoats * 20;
             revenue = numBoats * 50;
-            let fishGrowth = Math.round(totalFish * 0.05);
+            //create a random range for the fish growht factor between 0.05 to 0.1.
+            const minFishGrowthFactor = 0.05;
+            const maxFishGrowthFactor = 0.1;
+            const randomFishGrowthFactor =
+              Math.random() * (maxFishGrowthFactor - minFishGrowthFactor) +
+              minFishGrowthFactor;
+            let fishGrowth = Math.round(totalFish * randomFishGrowthFactor);
             totalFish -= fishCaught;
             totalFish += fishGrowth;
             totalRevenue += revenue;
@@ -156,7 +162,9 @@
             //Add final summary
             document.getElementById(
               "summary"
-            ).textContent = `End of your summary - Total Fish: ${totalFish}, Total Revenue: $${totalRevenue}, Fish growth this week: ${fishGrowth}.`;
+            ).textContent = `End of your summary - Total Fish: ${totalFish}, Total Revenue: $${totalRevenue}, Fish growth this week: ${fishGrowth}. Fish growth factor: ${randomFishGrowthFactor.toFixed(
+              2
+            )}`;
           }
         });
       document
